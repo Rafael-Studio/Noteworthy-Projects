@@ -1,0 +1,168 @@
+# Virtual Library DOCUMENTATION
+# books are registered into the database by user input (title, author, genre)
+# This program is a simple library database using sqlite with the following features:
+# 1 - listing registered books;
+# 2 - adding new books to the library;
+# 3 - searching the library;
+# 4 - borrowing and returning books;
+# 5 - excluding items from the database
+# This program has an interactive menu for easy of use
+# Run this program and select your choices to manage, search and modify the database
+
+from time import sleep
+import sqlite3
+
+
+# Initializing the book class
+class Book:
+    def __init__(self, title, author, genre, available=True):
+        self.title = title
+        self.author = author
+        self.genre = genre
+        self.available = True
+
+    def display_info(self):
+        print(f"Title: {self.title}")
+        print(f"Author: {self.author}")
+        print(f"Genre: {self.genre}")
+        print(f"Status: {'Available' if self.available else 'Borrowed'}")
+        formatting()
+
+    def borrow_book(self) -> object:
+        if self.available:
+            self.available = False
+            print(f"{self.title} has been borrowed.")
+            formatting()
+        else:
+            print(f"Sorry, {self.title} is not available for borrowing.")
+            formatting()
+
+    def return_book(self):
+        if not self.available:
+            self.available = True
+            print(f"Thank you for returning {self.title}.")
+            formatting()
+        else:
+            print(f"{self.title} is already available.")
+            formatting()
+
+
+# Separator for better visual experience
+def formatting():
+    print("-=" * 50)
+
+
+# Function to list every single book registered in the database
+def list_books():
+    print("List of Registered Books:")
+    formatting()
+
+    # Initialize database connection
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+
+    # Fetch all books from the database
+    cursor.execute('SELECT * FROM books')
+    books = cursor.fetchall()
+
+    if not books:
+        print("No books registered in the library.")
+    else:
+        # Display information for each book
+        for book in books:
+            status = "Status: Available" if book[4] else "Status: Borrowed"
+            print(f"Title: {book[1]}")
+            print(f"Author: {book[2]}")
+            print(f"Genre: {book[3]}")
+            print(status)
+            formatting()
+
+    # Close the connection
+    conn.close()
+
+
+# Function to add new books to the database
+def add_book():
+    print("Add a New Book to the Library.")
+    formatting()
+
+    title = str(input("Enter the title of the book: ")).strip()
+    author = str(input("Enter the author of the book: ")).strip()
+    genre = str(input("Enter the genre of the book: ")).strip()
+    available = True
+
+    print("\nPlease review the entered information:")
+    print(f"Title: {title}")
+    print(f"Author: {author}")
+    print(f"Genre: {genre}")
+
+    confirm = input("\nIs the information correct? [Y/N]: ").strip().upper()[0]
+    if confirm == "Y":
+
+        # Initialize database connection
+        conn = sqlite3.connect('library.db')
+        cursor = conn.cursor()
+
+        # Create a table for storing books
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY,
+                title TEXT,
+                author TEXT,
+                genre TEXT,
+                available INTEGER
+            )
+        ''')
+
+        # Insert the new book into the database
+        cursor.execute('''
+               INSERT INTO books (title, author, genre, available)
+               VALUES (?, ?, ?, ?)
+           ''', (title, author, genre, available))
+
+        # Commit the changes and close the connection
+        conn.commit()
+        conn.close()
+
+        print(f"\nBook '{title}' by {author} has been added to the library.")
+    else:
+        print("\nBook addition canceled. Please re-enter the information.")
+
+
+# Interactive menu
+def menu():
+    while True:
+        formatting()
+        print("Main Menu")
+        formatting()
+        sleep(1)
+        print("Options:")
+        print("[1] List Registered Books.\n"
+              "[2] Register a New Book.\n"
+              "[3] Search the Library.\n"
+              "[4] Borrow a Book.\n"
+              "[5] Return a Book.\n"
+              "[6] Exclude a Book from the Library.\n"
+              "[0] Close the Program.")
+        formatting()
+        try:
+            choice = int(input("Please, type your choice: "))
+        except KeyboardInterrupt:
+            print("\033[31mInterruption detected. Please, restart the program.\033[m")
+            break
+        except (ValueError, TypeError):
+            print("\033[31mInvalid input. Please, choose a valid option.\033[m")
+        if choice not in range(0, 6):
+            print("\033[31mInvalid input. Please, choose a valid option.\033[m\n")
+        if choice == 0:
+            formatting()
+            print("Program closed successfully.")
+            break
+        elif choice == 1:
+            list_books()
+        elif choice == 2:
+            add_book()
+
+
+if __name__ == "__main__":
+    menu()
