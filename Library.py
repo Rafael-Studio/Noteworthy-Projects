@@ -21,31 +21,6 @@ class Book:
         self.genre = genre
         self.available = True
 
-    def display_info(self):
-        print(f"Title: {self.title}")
-        print(f"Author: {self.author}")
-        print(f"Genre: {self.genre}")
-        print(f"Status: {'Available' if self.available else 'Borrowed'}")
-        formatting()
-
-    def borrow_book(self) -> object:
-        if self.available:
-            self.available = False
-            print(f"{self.title} has been borrowed.")
-            formatting()
-        else:
-            print(f"Sorry, {self.title} is not available for borrowing.")
-            formatting()
-
-    def return_book(self):
-        if not self.available:
-            self.available = True
-            print(f"Thank you for returning {self.title}.")
-            formatting()
-        else:
-            print(f"{self.title} is already available.")
-            formatting()
-
 
 # Separator for better visual experience
 def formatting():
@@ -71,10 +46,7 @@ def list_books():
         # Display information for each book
         for book in books:
             status = "Status: Available" if book[4] else "Status: Borrowed"
-            print(f"Title: {book[1]}")
-            print(f"Author: {book[2]}")
-            print(f"Genre: {book[3]}")
-            print(status)
+            print(f"Title: {book[1]}, Author: {book[2]}, Genre: {book[3]}, {status}")
             formatting()
 
     # Close the connection
@@ -99,11 +71,10 @@ def add_book():
     confirm = input("\nIs the information correct? [Y/N]: ").strip().upper()[0]
     if confirm == "Y":
 
-        # Initialize database connection
         conn = sqlite3.connect('library.db')
         cursor = conn.cursor()
 
-        # Create a table for storing books
+        # Creating a table for storing books
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY,
@@ -114,13 +85,13 @@ def add_book():
             )
         ''')
 
-        # Insert the new book into the database
+        # Inserting the new book into the database
         cursor.execute('''
                INSERT INTO books (title, author, genre, available)
                VALUES (?, ?, ?, ?)
            ''', (title, author, genre, available))
 
-        # Commit the changes and close the connection
+        # Committing the changes and close the connection
         conn.commit()
         conn.close()
 
@@ -128,6 +99,50 @@ def add_book():
     else:
         print("\nBook addition canceled. Please re-enter the information.")
 
+
+def borrow_book():
+    title = input("Enter the EXACT title of the book you want to borrow: ").strip()
+
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+
+    # Check if the book is available
+    cursor.execute('SELECT * FROM books WHERE title = ? AND available = 1', (title,))
+    book_data = cursor.fetchone()
+
+    if not book_data:
+        print(f"Book with title '{title}' not found or not available for borrowing in the library.")
+        formatting()
+    else:
+        # Update the database with the new availability status
+        cursor.execute('UPDATE books SET available = 0 WHERE title = ?', (title,))
+        conn.commit()
+        print(f"{title} has been borrowed.")
+        formatting()
+
+    conn.close()
+
+def return_book():
+    title = input("Enter the EXACT title of the book you want to return: ").strip()
+
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+
+    # Check if the book is already available
+    cursor.execute('SELECT * FROM books WHERE title = ? AND available = 0', (title,))
+    book_data = cursor.fetchone()
+
+    if not book_data:
+        print(f"Book with title '{title}' is either not found or already available in the library.")
+        formatting()
+    else:
+        # Update the database with the new availability status
+        cursor.execute('UPDATE books SET available = 1 WHERE title = ?', (title,))
+        conn.commit()
+        print(f"Thank you for returning {title}.")
+        formatting()
+
+    conn.close()
 
 # Interactive menu
 def menu():
@@ -148,12 +163,12 @@ def menu():
         try:
             choice = int(input("Please, type your choice: "))
         except KeyboardInterrupt:
-            print("\033[31mInterruption detected. Please, restart the program.\033[m")
+            print("\033[31mInterruption detected. Please restart the program.\033[m")
             break
         except (ValueError, TypeError):
-            print("\033[31mInvalid input. Please, choose a valid option.\033[m")
+            print("\033[31mInvalid input. Please choose a valid option.\033[m")
         if choice not in range(0, 6):
-            print("\033[31mInvalid input. Please, choose a valid option.\033[m\n")
+            print("\033[31mInvalid input. Please choose a valid option.\033[m\n")
         if choice == 0:
             formatting()
             print("Program closed successfully.")
@@ -162,6 +177,10 @@ def menu():
             list_books()
         elif choice == 2:
             add_book()
+        elif choice == 4:
+            borrow_book()
+        elif choice == 5:
+            return_book()
 
 
 if __name__ == "__main__":
