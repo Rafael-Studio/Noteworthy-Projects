@@ -1,13 +1,27 @@
 # Virtual Library DOCUMENTATION
-# books are registered into the database by user input (title, author, genre)
-# This program is a simple library database using sqlite with the following features:
-# 1 - listing registered books;
-# 2 - adding new books to the library;
-# 3 - searching the library;
-# 4 - borrowing and returning books;
-# 5 - excluding items from the database
-# This program has an interactive menu for easy of use
-# Run this program and select your choices to manage, search and modify the database
+# This program is a simple library database using SQLite with the following features:
+# 1 - List registered books;
+# 2 - Add new books to the library;
+# 3 - Search the library;
+# 4 - Borrow and return books;
+# 5 - Exclude items from the database.
+# This program features an interactive menu for ease of use.
+
+# Usage Instructions:
+# Run the program and select your choices to manage, search, and modify the database.
+
+# Features:
+# - **List Registered Books:** View a list of all books currently registered in the library.
+# - **Add New Books:** Register new books by providing title, author, and genre information.
+# - **Search the Library:** Search for books by title, author, or genre, narrowing down your search criteria.
+# - **Borrow and Return Books:** Manage the borrowing and returning process. The status of each book is updated in real-time.
+# - **Exclude Items:** Remove items from the database when necessary.
+#
+# Database:
+# The program utilizes SQLite for database management.
+#
+#  Note:
+# - Follow the on-screen prompts for a seamless and user-friendly experience.
 
 from time import sleep
 import sqlite3
@@ -100,6 +114,60 @@ def add_book():
         print("\nBook addition canceled. Please re-enter the information.")
 
 
+# Function to search books in the library by Title, Author or Genre
+def search_book():
+    while True:
+        print("Search the Library:")
+        formatting()
+
+        print("Choose a search criteria:\n"
+              "[1] Search by Title.\n"
+              "[2] Search by Author.\n"
+              "[3] Search by Genre.\n"
+              "[9] Return to Main Menu.")
+
+        try:
+            search_option = int(input("Enter the number corresponding to your choice: "))
+        except (ValueError, TypeError):
+            print("\033[31mInvalid input. Please enter a valid number.\033[m")
+            continue
+
+        if search_option not in [1, 2, 3, 9]:
+            print("\033[31mInvalid choice. Please select a valid option.\033[m")
+        elif search_option == 9:
+            break
+        else:
+            search_term = input("Enter the search term: ").strip().lower()
+
+            conn = sqlite3.connect('library.db')
+            cursor = conn.cursor()
+
+            if search_option == 1:
+                print(f"Executing query for title: {search_term}")
+                cursor.execute('SELECT * FROM books WHERE title LIKE ? COLLATE NOCASE', (search_term,))
+            elif search_option == 2:
+                print(f"Executing query for author: {search_term}")
+                cursor.execute('SELECT * FROM books WHERE author LIKE ? COLLATE NOCASE', (search_term,))
+            elif search_option == 3:
+                print(f"Executing query for genre: {search_term}")
+                cursor.execute('SELECT * FROM books WHERE genre LIKE ? COLLATE NOCASE', (search_term,))
+
+            books = cursor.fetchall()
+
+            if not books:
+                print(f"\033[31mNo books found matching the search term: {search_term}\033[m")
+            else:
+                print("Search Results:")
+                formatting()
+                for book in books:
+                    status = "Available" if book[4] else "Borrowed"
+                    print(f"Title: {book[1]}, Author: {book[2]}, Genre: {book[3]}, Status: {status}")
+                    formatting()
+
+            conn.close()
+
+
+# function to borrow a book from the library
 def borrow_book():
     title = input("Enter the EXACT title of the book you want to borrow: ").strip()
 
@@ -122,6 +190,8 @@ def borrow_book():
 
     conn.close()
 
+
+# function to return a previously borrowed book to the library
 def return_book():
     title = input("Enter the EXACT title of the book you want to return: ").strip()
 
@@ -144,6 +214,7 @@ def return_book():
 
     conn.close()
 
+
 # Interactive menu
 def menu():
     while True:
@@ -158,7 +229,7 @@ def menu():
               "[4] Borrow a Book.\n"
               "[5] Return a Book.\n"
               "[6] Exclude a Book from the Library.\n"
-              "[0] Close the Program.")
+              "[0] Exit the Program.")
         formatting()
         try:
             choice = int(input("Please, type your choice: "))
@@ -171,12 +242,14 @@ def menu():
             print("\033[31mInvalid input. Please choose a valid option.\033[m\n")
         if choice == 0:
             formatting()
-            print("Program closed successfully.")
+            print("Program exited successfully.")
             break
         elif choice == 1:
             list_books()
         elif choice == 2:
             add_book()
+        elif choice == 3:
+            search_book()
         elif choice == 4:
             borrow_book()
         elif choice == 5:
