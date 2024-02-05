@@ -26,6 +26,7 @@
 from time import sleep
 import sqlite3
 
+
 # Separator for better visual experience
 def formatting():
     print("-=" * 50)
@@ -272,4 +273,7 @@ def menu():
 
 
 if __name__ == "__main__":
+    formatting()
+    greeting = "Welcome to the Library!"
+    print(f"{greeting:^100}")
     menu()
