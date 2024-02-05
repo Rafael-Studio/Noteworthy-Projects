@@ -26,16 +26,6 @@
 from time import sleep
 import sqlite3
 
-
-# Initializing the book class
-class Book:
-    def __init__(self, title, author, genre, available=True):
-        self.title = title
-        self.author = author
-        self.genre = genre
-        self.available = True
-
-
 # Separator for better visual experience
 def formatting():
     print("-=" * 50)
@@ -50,8 +40,8 @@ def list_books():
     conn = sqlite3.connect('library.db')
     cursor = conn.cursor()
 
-    # Fetch all books from the database
-    cursor.execute('SELECT * FROM books')
+    # Fetch all books from the database in alphabetical order by title
+    cursor.execute('SELECT * FROM books ORDER BY title')
     books = cursor.fetchall()
 
     if not books:
@@ -144,13 +134,13 @@ def search_book():
 
             if search_option == 1:
                 print(f"Executing query for title: {search_term}")
-                cursor.execute('SELECT * FROM books WHERE title LIKE ? COLLATE NOCASE', (search_term,))
+                cursor.execute('SELECT * FROM books WHERE title LIKE ? COLLATE NOCASE ORDER BY title', (search_term,))
             elif search_option == 2:
                 print(f"Executing query for author: {search_term}")
-                cursor.execute('SELECT * FROM books WHERE author LIKE ? COLLATE NOCASE', (search_term,))
+                cursor.execute('SELECT * FROM books WHERE author LIKE ? COLLATE NOCASE ORDER BY author', (search_term,))
             elif search_option == 3:
                 print(f"Executing query for genre: {search_term}")
-                cursor.execute('SELECT * FROM books WHERE genre LIKE ? COLLATE NOCASE', (search_term,))
+                cursor.execute('SELECT * FROM books WHERE genre LIKE ? COLLATE NOCASE ORDER BY genre', (search_term,))
 
             books = cursor.fetchall()
 
@@ -215,6 +205,29 @@ def return_book():
     conn.close()
 
 
+def remove_book():
+    title = input("Enter the EXACT title of the book you want to remove: ").strip()
+
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+
+    # Check if the book exists in the library
+    cursor.execute('SELECT * FROM books WHERE title = ?', (title,))
+    book_data = cursor.fetchone()
+
+    if not book_data:
+        print(f"\033[31mBook with title '{title}' not found in the library.\033[m")
+        formatting()
+    else:
+        # Remove the book from the database
+        cursor.execute('DELETE FROM books WHERE title = ?', (title,))
+        conn.commit()
+        print(f"Book '{title}' has been removed from the library.")
+        formatting()
+
+    conn.close()
+
+
 # Interactive menu
 def menu():
     while True:
@@ -228,17 +241,17 @@ def menu():
               "[3] Search the Library.\n"
               "[4] Borrow a Book.\n"
               "[5] Return a Book.\n"
-              "[6] Exclude a Book from the Library.\n"
+              "[6] Remove a Book from the Library.\n"
               "[0] Exit the Program.")
         formatting()
         try:
-            choice = int(input("Please, type your choice: "))
+            choice = int(input("Please type your choice: "))
         except KeyboardInterrupt:
             print("\033[31mInterruption detected. Please restart the program.\033[m")
             break
         except (ValueError, TypeError):
             print("\033[31mInvalid input. Please choose a valid option.\033[m")
-        if choice not in range(0, 6):
+        if choice not in range(0, 7):
             print("\033[31mInvalid input. Please choose a valid option.\033[m\n")
         if choice == 0:
             formatting()
@@ -254,6 +267,8 @@ def menu():
             borrow_book()
         elif choice == 5:
             return_book()
+        elif choice == 6:
+            remove_book()
 
 
 if __name__ == "__main__":
