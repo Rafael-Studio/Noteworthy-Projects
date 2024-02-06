@@ -166,7 +166,7 @@ def borrow_book():
     cursor = conn.cursor()
 
     # Check if the book is available
-    cursor.execute('SELECT * FROM books WHERE title = ? AND available = 1', (title,))
+    cursor.execute('SELECT * FROM books WHERE title = ? COLLATE NOCASE AND available = 1', (title,))
     book_data = cursor.fetchone()
 
     if not book_data:
@@ -174,7 +174,7 @@ def borrow_book():
         formatting()
     else:
         # Update the database with the new availability status
-        cursor.execute('UPDATE books SET available = 0 WHERE title = ?', (title,))
+        cursor.execute('UPDATE books SET available = 0 WHERE title = ? COLLATE NOCASE', (title,))
         conn.commit()
         print(f"{title} has been borrowed.")
         formatting()
@@ -190,7 +190,7 @@ def return_book():
     cursor = conn.cursor()
 
     # Check if the book is already available
-    cursor.execute('SELECT * FROM books WHERE title = ? AND available = 0', (title,))
+    cursor.execute('SELECT * FROM books WHERE title = ? COLLATE NOCASE AND available = 0', (title,))
     book_data = cursor.fetchone()
 
     if not book_data:
@@ -198,7 +198,7 @@ def return_book():
         formatting()
     else:
         # Update the database with the new availability status
-        cursor.execute('UPDATE books SET available = 1 WHERE title = ?', (title,))
+        cursor.execute('UPDATE books SET available = 1 WHERE title = ? COLLATE NOCASE', (title,))
         conn.commit()
         print(f"Thank you for returning {title}.")
         formatting()
@@ -220,11 +220,15 @@ def remove_book():
         print(f"\033[31mBook with title '{title}' not found in the library.\033[m")
         formatting()
     else:
-        # Remove the book from the database
-        cursor.execute('DELETE FROM books WHERE title = ?', (title,))
-        conn.commit()
-        print(f"Book '{title}' has been removed from the library.")
-        formatting()
+        confirm = input("\nIs the information correct? [Y/N]: ").strip().upper()
+        if confirm == "Y":
+            # Remove the book from the database
+            cursor.execute('DELETE FROM books WHERE title = ? COLLATE NOCASE', (title,))
+            conn.commit()
+            print(f"Book '{title}' has been removed from the library.")
+            formatting()
+        else:
+            print("\nBook removal canceled.")
 
     conn.close()
 
