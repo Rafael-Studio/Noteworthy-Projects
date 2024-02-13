@@ -316,7 +316,7 @@ def menu():
                 "[0] Exit the Program."
             )
             formatting()
-            dumb_choice = True
+            invalid_choice = True
             choice = 0
 
             while dumb_choice:
