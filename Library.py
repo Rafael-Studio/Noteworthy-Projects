@@ -36,7 +36,7 @@ COLOR_MSG = {
 
 
 def log(level, msg):
-    print(f"{level.upper()}: {COLOR_MSG[level].format(msg=msg)}")
+    print(COLOR_MSG[level].format(msg=msg))
 
 
 # Separator for better visual experience
@@ -285,11 +285,11 @@ def remove_book():
 def has_books_table():
     with sqlite3.connect("library.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM books")
         try:
-            cursor.fetchall()
+            cursor.execute("SELECT * FROM books")
             return True
         except sqlite3.OperationalError:
+            print("No books detected.")
             return False
 
 
@@ -319,7 +319,7 @@ def menu():
             invalid_choice = True
             choice = 0
 
-            while dumb_choice:
+            while invalid_choice:
                 try:
                     choice = int(input("Please type your choice: "))
                 except KeyboardInterrupt:
@@ -329,7 +329,7 @@ def menu():
                     log("error", "Invalid input. Please choose a valid option.")
 
                 if choice in range(0, 7):
-                    dumb_choice = False
+                    invalid_choice = False
                 else:
                     log("error", "Invalid input. Please choose a valid option.\n")
 
@@ -346,7 +346,7 @@ def menu():
                 case 5: return_book()
                 case 6: remove_book()
                 case _: log("error", "Unexpected error")
-        except sqlite3.OperationalError as err:
+        except sqlite3.DatabaseError as err:
             log("critical", f"Database error: {err}")
 
 
