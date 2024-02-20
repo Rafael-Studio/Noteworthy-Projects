@@ -86,7 +86,9 @@ def add_book():
     print(f"Genre: {genre}")
 
     confirm = input("\nIs the information correct? [Y/n]: ").strip().upper()
-    if confirm != "N":
+    while confirm not in "YN":
+        confirm = input("Invalid input. Please confirm if the entered information is correct [Y/n]: ").strip().upper()
+    if confirm == "Y":
 
         conn = sqlite3.connect("library.db")
         cursor = conn.cursor()
@@ -107,9 +109,9 @@ def add_book():
         # Inserting the new book into the database
         cursor.execute(
             """
-               INSERT INTO books (title, author, genre, available)
-               VALUES (?, ?, ?, ?)
-           """,
+            INSERT INTO books (title, author, genre, available)
+            VALUES (?, ?, ?, ?)
+        """,
             (title, author, genre, available),
         )
 
@@ -117,11 +119,10 @@ def add_book():
         conn.commit()
         conn.close()
 
-        print("\n")
-        log("info", f"Book '{title}' by {author} has been added to the library.")
-    else:
-        print("\n")
-        log("info", "Book addition canceled. Please re-enter the information.")
+        log("info", f"\nBook '{title}' by {author} has been added to the library.")
+
+    if confirm == "N":
+        log("info", "\nBook addition canceled. Please re-enter the information.")
 
 
 # Function to search books in the library by Title, Author or Genre
@@ -179,7 +180,7 @@ def search_book():
 
             if not books:
                 log("error", f"No books found matching the search term: {search_term}")
-                sleep(2)
+                sleep(1)
             else:
                 print("Search Results:")
                 formatting()
@@ -189,7 +190,7 @@ def search_book():
                         f"Title: {book[1]}, Author: {book[2]}, Genre: {book[3]}, Status: {status}"
                     )
                     formatting()
-                sleep(5)
+                sleep(1)
 
             conn.close()
 
@@ -269,14 +270,17 @@ def remove_book():
         log("error", f"Book with title '{title}' not found in the library.")
         formatting()
     else:
-        confirm = input("\nIs the information correct? [Y/n]: ").strip().upper()
-        if confirm != "N":
+        confirm = input("\nIs the information correct? [Y/N]: ").strip().upper()
+        while confirm not in "YN":
+            confirm = input(
+                "Invalid input. Please confirm if the entered information is correct [Y/n]: ").strip().upper()
+        if confirm == "Y":
             # Remove the book from the database
             cursor.execute("DELETE FROM books WHERE title = ? COLLATE NOCASE", (title,))
             conn.commit()
-            log("info", f"Book '{title}' has been removed from the library.")
+            log("info", f"\nBook '{title}' has been removed from the library.")
             formatting()
-        else:
+        if confirm == "N":
             print("\nBook removal canceled.")
 
     conn.close()
@@ -322,16 +326,15 @@ def menu():
             while invalid_choice:
                 try:
                     choice = int(input("Please type your choice: "))
+                    if choice in range(0, 7):
+                        invalid_choice = False
+                    else:
+                        log("error", "Invalid input. Please choose a valid option.\n")
                 except KeyboardInterrupt:
-                    log("info", "Interruption detected. Please restart the program.")
+                    log("info", "\nInterruption detected. Please restart the program.")
                     exit(0)
                 except (ValueError, TypeError):
                     log("error", "Invalid input. Please choose a valid option.")
-
-                if choice in range(0, 7):
-                    invalid_choice = False
-                else:
-                    log("error", "Invalid input. Please choose a valid option.\n")
 
         try:
             match choice:
@@ -339,13 +342,20 @@ def menu():
                     formatting()
                     print("Program exited successfully.")
                     exit(0)
-                case 1: list_books()
-                case 2: add_book()
-                case 3: search_book()
-                case 4: borrow_book()
-                case 5: return_book()
-                case 6: remove_book()
-                case _: log("error", "Unexpected error")
+                case 1:
+                    list_books()
+                case 2:
+                    add_book()
+                case 3:
+                    search_book()
+                case 4:
+                    borrow_book()
+                case 5:
+                    return_book()
+                case 6:
+                    remove_book()
+                case _:
+                    log("error", "Unexpected error")
         except sqlite3.DatabaseError as err:
             log("critical", f"Database error: {err}")
 
