@@ -1,7 +1,7 @@
 """
 Python exercise from "Python Journey" Python training by Hashtag.
 
-Challenge: given a file ("produtos.csv") containing various information about hypothetical products,
+Challenge: given a CSV file ("produtos.csv") containing various information about hypothetical products,
 such as "codigo", "marca", "tipo", "categoria", "preco_unitario", "custo", "obs", create an automation program
 to read and extract the information on that file and register them in the e-commerce mock website:
 (https://dlp.hashtagtreinamentos.com/python/intensivao/login).
@@ -24,6 +24,8 @@ pyautogui.press("enter")
 # accessing website
 pyautogui.write("https://dlp.hashtagtreinamentos.com/python/intensivao/login")
 pyautogui.press("enter")
+
+# pause to ensure that the browser window and website have loaded properly before proceeding with the next steps.
 sleep(3)
 
 # sign-up process
@@ -44,7 +46,7 @@ table = pd.read_csv("produtos.csv")
 # Registering a product in the website
 for line in table.index:
     # clicking the "codigo" field in the website
-    pyautogui.click(x=653, y=294)  # Attention: coordinates may vary according to resolution
+    pyautogui.click(x=653, y=294)  # Attention: coordinates may vary according to resolution. May need calibration
 
     # fetching from the table the value to be registered in the website
     code = table.loc[line, "codigo"]
@@ -68,7 +70,7 @@ for line in table.index:
     pyautogui.press("tab")
     obs = table.loc[line, "obs"]
 
-    # In this specific case, some values in the "obs" field were flagged as NaN
+    # In this case, some values in the "obs" field were flagged as NaN. The following line of code addresses this issue
     if not pd.isna(obs):
         pyautogui.write(str(table.loc[line, "obs"]))
     pyautogui.press("tab")
