@@ -1,3 +1,24 @@
+# Banking System DOCUMENTATION
+# This program is a simple banking system designed as part of SUZANO-DIO Python Bootcamp.
+# Task consisted in making a simple banking system with the following parameters:
+# 1 - User can deposit, withdraw or check balance;
+# 2 - there is a limit of maximum withdrawals (3);
+# 3 - there is a limit to the maximum value of a single withdrawal (R$500);
+# This program features an interactive menu for ease of use.
+
+# Usage Instructions:
+# Run the program and select your choices to deposit, withdraw and check account balance.
+
+# Features:
+# - **Deposit Funds:** Add money to your account.
+# - **Withdraw Funds:** Withdraw cash with per-transaction and daily limits.
+# - **Check Balance:** View your current balance and transaction history.
+# - **Withdrawal Limits:** Maximum of 3 withdrawals per session and R$500 per transaction.
+
+#  Notes:
+# - Follow the on-screen prompts in this CLI-based menu that loops until the user chooses to quit.
+# - System messages are in Portuguese (PT-BR) as per task instructions.
+
 menu = """
 
 [d] Deposit
@@ -17,25 +38,32 @@ num_withdraw = 0
 while True:
     choice = input(menu).strip().lower()
 
-    if choice not in "dwsq":
-        print("Opção inválida. Por favor, escolha uma das opções listadas.")
-
     if choice == "d":
-        valor = float(input("Informe o valor do depósito: "))
+        try:
+            value = float(input("Informe o valor do depósito: "))
 
-        if valor > 0:
-            balance += valor
-            statement += f"Depósito: R$ {valor:.2f}\n"
+        except ValueError:
+            print("Entrada inválida! Por favor, insira um número.")
+            continue
+
+        if value > 0:
+            balance += value
+            statement += f"Depósito: R$ {value:.2f}\n"
 
         else:
             print("Operação falhou! O valor informado é inválido.")
 
     elif choice == "w":
-        valor = float(input("Informe o valor do saque: "))
+        try:
+            value = float(input("Informe o valor do saque: "))
 
-        overdraft = valor > balance
+        except ValueError:
+            print("Entrada inválida! Por favor, insira um número.")
+            continue
 
-        over_limit = valor > limit
+        overdraft = value > balance
+
+        over_limit = value > limit
 
         over_withdraw = num_withdraw >= MAX_WITHDRAW
 
@@ -48,9 +76,9 @@ while True:
         elif over_withdraw:
             print("Operação falhou! Número máximo de saques excedido.")
 
-        elif valor > 0:
-            balance -= valor
-            statement += f"Saque: R$ {valor:.2f}\n"
+        elif value > 0:
+            balance -= value
+            statement += f"Saque: R$ {value:.2f}\n"
             num_withdraw += 1
 
         else:
