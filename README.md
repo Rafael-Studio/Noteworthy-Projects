@@ -1,4 +1,5 @@
 📌 Noteworthy Projects
+
 Welcome to my repository!
 This is a curated collection of personal projects developed as part of my transition into the world of software development. Each project is a reflection of my growing technical skills, problem-solving mindset, and commitment to continuous learning.
 
