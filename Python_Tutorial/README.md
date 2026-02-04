@@ -13,7 +13,7 @@ This is a **free Python tutorial**, developed as a university extension project 
 
 ## Contents
 
-The tutorial covers the **basic concepts of Python**, including:
+Part 1 of this tutorial covers the **basic concepts of Python**, including:
 
 - Introduction to Python  
 - Basic language structures  
@@ -22,7 +22,14 @@ The tutorial covers the **basic concepts of Python**, including:
 - Decision structures (`if`, `elif`, `else`)  
 - Basic input data handling  
 
-📌 This is only **Part I**. Future parts will cover more advanced topics.  
+Part 2 of this tutorial further covers the **basic concepts of Python**, including:
+
+- Strings
+- For Loops
+- While Loops
+- Exercises
+
+📌 Future parts will cover more advanced topics.  
 
 ---
 
@@ -46,16 +53,23 @@ Este é um **tutorial gratuito de Python**, desenvolvido como projeto de extens�
 
 ## Conteúdo
 
-O tutorial aborda os **conceitos básicos de Python**, incluindo:
+A parte 1 do tutorial aborda os **conceitos básicos de Python**, incluindo:
 
 - Introdução ao Python  
 - Estruturas básicas da linguagem  
 - Comando `print()` e strings formatadas  
 - Bibliotecas padrão  
 - Estruturas de decisão (`if`, `elif`, `else`)  
-- Tratamento inicial de dados de entrada  
+- Tratamento inicial de dados de entrada
 
-📌 Esta é apenas a **Parte I**. Outras partes estão previstas para cobrir tópicos mais avançados em breve.  
+A parte 2 do tutorial continua com **conceitos básicos de Python**, incluindo:
+
+- Strings
+- Laços For
+- Laços While
+- Exercícios
+
+📌 Outras partes estão previstas para cobrir tópicos mais avançados em breve.  
 
 ---
 
