@@ -1,5 +1,5 @@
 
-# Python Didactic Tutorial 🐍
+# Python Educational Tutorial 🐍
 
 This is a **free Python tutorial**, developed as a university extension project in the **Computer Science program at UNIP**.
 
